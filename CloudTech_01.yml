@@ -20,7 +20,7 @@ Resources:
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: !Sub "cloudtech-VPC"
+          Value: "cloudtech-VPC"
 
   PublicSubnet:
     Type: AWS::EC2::Subnet
@@ -30,7 +30,7 @@ Resources:
       CidrBlock: !Ref PublicSubnetCidrBlock
       Tags:
         - Key: Name
-          Value: !Sub "cloudtech-PublicSubnet"
+          Value: "cloudtech-PublicSubnet"
 
   PrivateSubnet:
     Type: AWS::EC2::Subnet
@@ -40,14 +40,14 @@ Resources:
       CidrBlock: !Ref PrivateSubnetCidrBlock
       Tags:
         - Key: Name
-          Value: !Sub "cloudtech-PrivateSubnet"
+          Value: "cloudtech-PrivateSubnet"
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub "cloudtech-InternetGateway"
+          Value: "cloudtech-InternetGateway"
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
