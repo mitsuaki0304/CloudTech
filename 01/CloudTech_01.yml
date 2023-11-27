@@ -1,7 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: cloudtech_01 
+Description: cloudtech_01 VPC and Subnet Create
 
 Parameters:
+  Prefix:
+    Type: String
+    Default: "cloudtech"
   VpcCidrBlock: 
     Type: String
     Default: "10.0.0.0/16"
@@ -13,44 +16,92 @@ Parameters:
     Default: "10.0.2.0/24"
 
 Resources:
-  MyVPC:
+# ------------------------------------------------------------#
+#  VPC
+# ------------------------------------------------------------#
+# VPC Create
+  VPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCidrBlock
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: "cloudtech-VPC"
+          Value: !Sub "${Prefix}-VPC"
 
-  PublicSubnet:
+# ------------------------------------------------------------#
+#  Subnet
+# ------------------------------------------------------------#       
+# Public Subnet1A Create
+  PublicSubnet1A:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: ap-northeast-1a
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: !Ref PublicSubnetCidrBlock
       Tags:
         - Key: Name
-          Value: "cloudtech-PublicSubnet"
+          Value: !Sub "${Prefix}-PublicSubnet1A"
 
-  PrivateSubnet:
+# Private Subnet1A Create
+  PrivateSubnet1A:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: ap-northeast-1a
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: !Ref PrivateSubnetCidrBlock
       Tags:
         - Key: Name
-          Value: "cloudtech-PrivateSubnet"
+          Value: !Sub "${Prefix}-PrivateSubnet1A"
 
+# ------------------------------------------------------------#
+#  InternetGateway
+# ------------------------------------------------------------#    
+# InternetGateway Create
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: "cloudtech-InternetGateway"
-
+          Value: !Sub "${Prefix}-InternetGateway"
+          
+# InternetGateway Attach
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
+
+# ------------------------------------------------------------#
+#  RouteTable
+# ------------------------------------------------------------#    
+# Public RouteTableA Create
+  PublicRouteTableA: 
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${Prefix}-PublicRouteTableA"
+
+# ------------------------------------------------------------#
+#  Routing
+# ------------------------------------------------------------# 
+#Public RouteTableA Setting
+  PublicRouteA:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTableA
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+
+# ------------------------------------------------------------#
+# RouteTable Associate
+# ------------------------------------------------------------# 
+# PublicRouteTable Associate SubnetA
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTableA
+      SubnetId: !Ref PublicSubnet1A
+ 
